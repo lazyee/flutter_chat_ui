@@ -8,17 +8,16 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_chat_ui/widget/extended_text/lib/extended_text_library.dart';
 
-import '../extended_render_paragraph.dart';
-import '../extended_rich_text.dart';
-import '../text_overflow_widget.dart';
-import 'extended_text_selection_pointer_handler.dart';
+import '../src/extended_render_paragraph.dart';
+import '../src/extended_rich_text.dart';
+import '../src/text_overflow_widget.dart';
+import 'custom_extended_text_selection_pointer_handler.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/6/5
 ///
-
-class ExtendedTextSelection extends StatefulWidget {
-  const ExtendedTextSelection({
+class CustomExtendedTextSelection extends StatefulWidget {
+  const CustomExtendedTextSelection({
     this.onTap,
     this.softWrap,
     this.locale,
@@ -130,12 +129,16 @@ class ExtendedTextSelection extends StatefulWidget {
   final StrutStyle? strutStyle;
 
   @override
-  ExtendedTextSelectionState createState() => ExtendedTextSelectionState();
+  CustomExtendedTextSelectionState createState() =>
+      CustomExtendedTextSelectionState();
 }
 
-class ExtendedTextSelectionState extends State<ExtendedTextSelection>
+// CustomExtendedTextSelectionOverlay? _selectionOverlay;
+
+class CustomExtendedTextSelectionState
+    extends State<CustomExtendedTextSelection>
     implements
-        ExtendedTextSelectionGestureDetectorBuilderDelegate,
+        // ExtendedTextSelectionGestureDetectorBuilderDelegate,
         TextSelectionDelegate,
         TextInputClient {
   final GlobalKey _renderParagraphKey = GlobalKey();
@@ -147,9 +150,9 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   final LayerLink _toolbarLayerLink = LayerLink();
   final LayerLink _startHandleLayerLink = LayerLink();
   final LayerLink _endHandleLayerLink = LayerLink();
-  ExtendedTextSelectionPointerHandlerState? _pointerHandlerState;
-  late CommonTextSelectionGestureDetectorBuilder
-      _selectionGestureDetectorBuilder;
+  CustomExtendedTextSelectionPointerHandlerState? _pointerHandlerState;
+  // late CustomTextSelectionGestureDetectorBuilder
+  //     _selectionGestureDetectorBuilder;
   final ClipboardStatusNotifier? _clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
 
@@ -163,15 +166,15 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     _clipboardStatus?.addListener(_onChangedClipboardStatus);
     _focusAttachment = _effectiveFocusNode.attach(context);
     _effectiveFocusNode.addListener(_handleFocusChanged);
-    _selectionGestureDetectorBuilder =
-        CommonTextSelectionGestureDetectorBuilder(
-      delegate: this,
-      hideToolbar: hideToolbar,
-      showToolbar: showToolbar,
-      onTap: widget.onTap,
-      context: context,
-      requestKeyboard: requestKeyboard,
-    );
+    // _selectionGestureDetectorBuilder =
+    //     CustomTextSelectionGestureDetectorBuilder(
+    //   delegate: this,
+    //   hideToolbar: hideToolbar,
+    //   showToolbar: showToolbar,
+    //   onTap: widget.onTap,
+    //   context: context,
+    //   requestKeyboard: requestKeyboard,
+    // );
     textEditingValue = TextEditingValue(
         text: widget.data!,
         selection: const TextSelection.collapsed(offset: 0));
@@ -179,8 +182,34 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     super.initState();
   }
 
+  ///选择全部
+  void selectAll() {
+    userUpdateTextEditingValue(
+      TextEditingValue(
+        text: textEditingValue.text,
+        selection: TextSelection(
+          baseOffset: 0,
+          extentOffset: textEditingValue.text.length,
+        ),
+      ),
+      SelectionChangedCause.longPress,
+    );
+
+    // _selectionOverlay?.hide();
+    // _hideSelectionOverlayIfNeeded();
+    initSeletionOverlay();
+    _selectionOverlay?.showHandles();
+    // bringIntoView(textEditingValue.selection.extent);
+  }
+
+  // void unSelect() {
+  //   print('unSelect');
+  //   _hideSelectionOverlayIfNeeded();
+  //   renderEditable.selectWord(cause: SelectionChangedCause.tap);
+  // }
+
   @override
-  void didUpdateWidget(ExtendedTextSelection oldWidget) {
+  void didUpdateWidget(CustomExtendedTextSelection oldWidget) {
     if (oldWidget.textSelectionControls != widget.textSelectionControls) {
       _textSelectionControls = widget.textSelectionControls;
       final ThemeData theme = Theme.of(context);
@@ -257,8 +286,8 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
     final ThemeData theme = Theme.of(context);
     final TextSelectionThemeData selectionTheme =
         TextSelectionTheme.of(context);
-    _pointerHandlerState = context
-        .findAncestorStateOfType<ExtendedTextSelectionPointerHandlerState>();
+    _pointerHandlerState = context.findAncestorStateOfType<
+        CustomExtendedTextSelectionPointerHandlerState>();
     if (_pointerHandlerState != null) {
       if (!_pointerHandlerState!.selectionStates.contains(this)) {
         _pointerHandlerState!.selectionStates.add(this);
@@ -337,14 +366,14 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
               ),
             )));
 
-    result = _selectionGestureDetectorBuilder.buildGestureDetector(
-      behavior: HitTestBehavior.translucent,
-      child: result,
-    );
-    result = MouseRegion(
-      child: result,
-      cursor: SystemMouseCursors.text,
-    );
+    // result = _selectionGestureDetectorBuilder.buildGestureDetector(
+    //   behavior: HitTestBehavior.translucent,
+    //   child: result,
+    // );
+    // result = MouseRegion(
+    //   child: result,
+    //   cursor: SystemMouseCursors.text,
+    // );
     return result;
   }
 
@@ -354,13 +383,7 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         : null;
   }
 
-  void _handleSelectionChanged(
-      TextSelection selection, SelectionChangedCause cause) {
-    textEditingValue = textEditingValue.copyWith(selection: selection);
-    _hideSelectionOverlayIfNeeded();
-    requestKeyboard();
-    //todo
-    //    if (widget.selectionControls != null) {
+  void initSeletionOverlay() {
     _selectionOverlay = ExtendedTextSelectionOverlay(
         clipboardStatus: _clipboardStatus,
         context: context,
@@ -375,7 +398,36 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
         onSelectionHandleTapped: _handleSelectionHandleTapped,
         handlesVisible: true,
         selectionControls: _textSelectionControls);
+  }
+
+  void _handleSelectionChanged(
+      TextSelection selection, SelectionChangedCause cause) {
+    print('_handleSelectionChanged');
+    textEditingValue = textEditingValue.copyWith(selection: selection);
+    _hideSelectionOverlayIfNeeded();
+    requestKeyboard();
+    //todo
+    initSeletionOverlay();
+
+    //    if (widget.selectionControls != null) {
+    // _selectionOverlay = ExtendedTextSelectionOverlay(
+    //     clipboardStatus: _clipboardStatus,
+    //     context: context,
+    //     debugRequiredFor: widget,
+    //     toolbarLayerLink: _toolbarLayerLink,
+    //     startHandleLayerLink: _startHandleLayerLink,
+    //     endHandleLayerLink: _endHandleLayerLink,
+    //     renderObject: _renderParagraph!,
+    //     value: textEditingValue,
+    //     dragStartBehavior: widget.dragStartBehavior!,
+    //     selectionDelegate: this,
+    //     onSelectionHandleTapped: _handleSelectionHandleTapped,
+    //     handlesVisible: true,
+    //     selectionControls: _textSelectionControls);
     final bool longPress = cause == SelectionChangedCause.longPress;
+    print('cause:$cause');
+    print('widget.text!.toPlainText():${widget.text!.toPlainText()}');
+    print('longPress:$longPress');
     if (cause != SelectionChangedCause.keyboard &&
         (widget.text!.toPlainText().isNotEmpty || longPress))
       _selectionOverlay!.showHandles();
@@ -429,35 +481,41 @@ class ExtendedTextSelectionState extends State<ExtendedTextSelection>
   /// Returns `false` if a toolbar couldn't be shown such as when no text
   /// selection currently exists.
   bool showToolbar() {
-    if (_selectionOverlay == null) {
-      return false;
-    }
-    _selectionOverlay!.showToolbar();
+    ///不再处理toolBar的显示
+    // if (_selectionOverlay == null) {
+    //   return false;
+    // }
+    // _selectionOverlay!.showToolbar();
+    // return true;
+
     return true;
   }
 
   @override
   void hideToolbar([bool hideHandles = true]) {
-    if (hideHandles) {
-      // Hide the handles and the toolbar.
-      _selectionOverlay?.hide();
-    } else {
-      // Hide only the toolbar but not the handles.
-      _selectionOverlay?.hideToolbar();
-    }
+    ///不再处理toolBar的显示
+    // if (hideHandles) {
+    //   // Hide the handles and the toolbar.
+    //   _selectionOverlay?.hide();
+    // } else {
+    //   // Hide only the toolbar but not the handles.
+    //   _selectionOverlay?.hideToolbar();
+    // }
   }
 
   /// Toggles the visibility of the toolbar.
   void toggleToolbar() {
-    assert(_selectionOverlay != null);
-    if (_selectionOverlay!.toolbarIsVisible) {
-      hideToolbar();
-    } else {
-      showToolbar();
-    }
+    ///不再处理toolBar的显示
+    // assert(_selectionOverlay != null);
+    // if (_selectionOverlay!.toolbarIsVisible) {
+    //   hideToolbar();
+    // } else {
+    //   showToolbar();
+    // }
   }
 
   void _hideSelectionOverlayIfNeeded() {
+    // unSelect();
     _selectionOverlay?.hide();
     _selectionOverlay = null;
   }
