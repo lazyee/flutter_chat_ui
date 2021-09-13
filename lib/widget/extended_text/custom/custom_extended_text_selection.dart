@@ -1,16 +1,15 @@
 import 'dart:ui';
 
+import 'package:extended_text/extended_text.dart';
+import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_chat_ui/widget/extended_text/lib/extended_text_library.dart';
 
-import '../src/extended_render_paragraph.dart';
-import '../src/extended_rich_text.dart';
-import '../src/text_overflow_widget.dart';
+import 'custom_extended_selection_overlay.dart';
 import 'custom_extended_text_selection_pointer_handler.dart';
 
 ///
@@ -31,6 +30,7 @@ class CustomExtendedTextSelection extends StatefulWidget {
     this.dragStartBehavior,
     this.data,
     this.textSelectionControls,
+    this.onTextSelectedChanged,
     this.textWidthBasis,
     this.textHeightBehavior,
     this.selectionHeightStyle = BoxHeightStyle.tight,
@@ -39,6 +39,7 @@ class CustomExtendedTextSelection extends StatefulWidget {
     this.strutStyle,
     Key? key,
   }) : super(key: key);
+  final ValueChanged<String>? onTextSelectedChanged;
   final TextOverflowWidget? overFlowWidget;
 
   /// Controls how tall the selection highlight boxes are computed to be.
@@ -145,7 +146,7 @@ class CustomExtendedTextSelectionState
   ExtendedRenderParagraph? get _renderParagraph =>
       _renderParagraphKey.currentContext!.findRenderObject()
           as ExtendedRenderParagraph?;
-  ExtendedTextSelectionOverlay? _selectionOverlay;
+  CustomExtendedSelectionOverlay? _selectionOverlay;
   TextSelectionControls? _textSelectionControls;
   final LayerLink _toolbarLayerLink = LayerLink();
   final LayerLink _startHandleLayerLink = LayerLink();
@@ -384,7 +385,7 @@ class CustomExtendedTextSelectionState
   }
 
   void initSeletionOverlay() {
-    _selectionOverlay = ExtendedTextSelectionOverlay(
+    _selectionOverlay = CustomExtendedSelectionOverlay(
         clipboardStatus: _clipboardStatus,
         context: context,
         debugRequiredFor: widget,
@@ -481,6 +482,8 @@ class CustomExtendedTextSelectionState
   /// Returns `false` if a toolbar couldn't be shown such as when no text
   /// selection currently exists.
   bool showToolbar() {
+    print('showToolbar');
+
     ///不再处理toolBar的显示
     // if (_selectionOverlay == null) {
     //   return false;
@@ -493,6 +496,8 @@ class CustomExtendedTextSelectionState
 
   @override
   void hideToolbar([bool hideHandles = true]) {
+    print('hideToolbar');
+
     ///不再处理toolBar的显示
     // if (hideHandles) {
     //   // Hide the handles and the toolbar.
@@ -505,6 +510,8 @@ class CustomExtendedTextSelectionState
 
   /// Toggles the visibility of the toolbar.
   void toggleToolbar() {
+    print('toggleToolbar');
+
     ///不再处理toolBar的显示
     // assert(_selectionOverlay != null);
     // if (_selectionOverlay!.toolbarIsVisible) {
@@ -515,6 +522,7 @@ class CustomExtendedTextSelectionState
   }
 
   void _hideSelectionOverlayIfNeeded() {
+    print('_hideSelectionOverlayIfNeeded');
     // unSelect();
     _selectionOverlay?.hide();
     _selectionOverlay = null;
@@ -528,6 +536,7 @@ class CustomExtendedTextSelectionState
 
   ///clear selection if it has.
   void clearSelection() {
+    print('clearSelction');
     if (!textEditingValue.selection.isCollapsed) {
       textEditingValue = textEditingValue.copyWith(
           selection: const TextSelection.collapsed(offset: 0));
@@ -536,6 +545,7 @@ class CustomExtendedTextSelectionState
 
   /// Toggle the toolbar when a selection handle is tapped.
   void _handleSelectionHandleTapped() {
+    print('_handleSelectionHandleTapped');
     if (textEditingValue.selection.isCollapsed) {
       toggleToolbar();
     }
@@ -631,7 +641,9 @@ class CustomExtendedTextSelectionState
   void performPrivateCommand(String action, Map<String, dynamic> data) {}
 
   @override
-  void showAutocorrectionPromptRect(int start, int end) {}
+  void showAutocorrectionPromptRect(int start, int end) {
+    print('start:$start,end:$end');
+  }
 
   @override
   void updateEditingValue(TextEditingValue value) {

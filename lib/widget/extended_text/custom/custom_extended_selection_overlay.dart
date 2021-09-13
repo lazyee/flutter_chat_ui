@@ -1,13 +1,11 @@
 import 'dart:math' as math;
 
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-
-import '../../extended_text_library.dart';
-import '../extended_text_utils.dart';
 
 ///
 ///  create by zmtzawqlp on 2019/7/31
@@ -23,11 +21,11 @@ enum _TextSelectionHandlePosition { start, end }
 ///
 /// The selection handles are displayed in the [Overlay] that most closely
 /// encloses the given [BuildContext].
-class ExtendedTextSelectionOverlay {
+class CustomExtendedSelectionOverlay {
   /// Creates an object that manages overly entries for selection handles.
   ///
   /// The [context] must not be null and must have an [Overlay] as an ancestor.
-  ExtendedTextSelectionOverlay({
+  CustomExtendedSelectionOverlay({
     required TextEditingValue value,
     required this.context,
     this.debugRequiredFor,
@@ -373,6 +371,14 @@ class ExtendedTextSelectionOverlay {
         textPosition = newSelection.extent;
         break;
     }
+
+    ///获取选中的文本
+    String _orginalText = _value.text;
+    String _newText = _orginalText.substring(
+        newSelection.baseOffset, newSelection.extentOffset);
+    print('newText:$_newText');
+    // print(
+    //     'select text:${_value.copyWith(selection: newSelection, composing: TextRange.empty).selection}');
     selectionDelegate!.userUpdateTextEditingValue(
       _value.copyWith(selection: newSelection, composing: TextRange.empty),
       SelectionChangedCause.drag,
@@ -435,7 +441,7 @@ class _TextSelectionHandleOverlayState
     super.initState();
 
     _controller = AnimationController(
-        duration: ExtendedTextSelectionOverlay.fadeDuration, vsync: this);
+        duration: CustomExtendedSelectionOverlay.fadeDuration, vsync: this);
 
     _handleVisibilityChanged();
     widget._visibility.addListener(_handleVisibilityChanged);
@@ -482,10 +488,17 @@ class _TextSelectionHandleOverlayState
           widget.renderObject.text!, position);
     }
 
-    if (widget.selection.isCollapsed) {
-      widget.onSelectionHandleChanged(TextSelection.fromPosition(position!));
-      return;
-    }
+    // print('widget.renderObject.text:${widget.renderObject.text}');
+    // print('postion:$position');
+    // if (position != null) {
+    //   print(
+    //       'TextSelection.fromPosition(position!):${TextSelection.fromPosition(position)}');
+    // }
+
+    // if (widget.selection.isCollapsed) {
+    //   widget.onSelectionHandleChanged(TextSelection.fromPosition(position!));
+    //   return;
+    // }
 
     TextSelection? newSelection;
     switch (widget.position) {

@@ -1,12 +1,11 @@
 import 'dart:ui' as ui show TextHeightBehavior, BoxWidthStyle, BoxHeightStyle;
 
+import 'package:extended_text/extended_text.dart';
+import 'package:extended_text/src/extended_rich_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_ui/widget/extended_text/lib/extended_text_library.dart';
 
-import '../src/extended_rich_text.dart';
-import '../src/text_overflow_widget.dart';
 import 'custom_extended_text_selection.dart';
 
 class CustomExtendedText extends StatelessWidget {

@@ -22,10 +22,10 @@ class ChatBubbleContainer extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ChatBubbleContainerState createState() => _ChatBubbleContainerState();
+  ChatBubbleContainerState createState() => ChatBubbleContainerState();
 }
 
-class _ChatBubbleContainerState extends State<ChatBubbleContainer> {
+class ChatBubbleContainerState extends State<ChatBubbleContainer> {
   late Color color;
   @override
   void initState() {

@@ -27,18 +27,26 @@ class ChatTextBubbleContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<CustomExtendedTextSelectionState> _globalKey = GlobalKey();
+    final GlobalKey<CustomExtendedTextSelectionState> _textGlobalKey =
+        GlobalKey();
+    final GlobalKey<ChatBubbleContainerState> _bubbleGlobalKey = GlobalKey();
     return ChatBubbleContainer(
+        key: _bubbleGlobalKey,
         child: CustomExtendedSelectionText(
           text,
-          customExtendedSelectionTextStateGlobalKey: _globalKey,
+          customExtendedSelectionTextStateGlobalKey: _textGlobalKey,
           style: style,
         ),
         onLongPress: () {
-          print('onLongPress:${_globalKey.currentState}');
-          _globalKey.currentState?.selectAll();
+          // RenderBox? renderBox =
+          //     _bubbleGlobalKey.currentContext?.findRenderObject() as RenderBox;
+          // Offset offset = renderBox.localToGlobal(Offset.zero);
+          // renderBox.size;
+          // .print('onLongPress:${_textGlobalKey.currentState}');
+          // showChatToolBar(context, offset, renderBox.size);
+          _textGlobalKey.currentState?.selectAll();
 
-          print(_globalKey.currentState?.textEditingValue.text);
+          print(_textGlobalKey.currentState?.textEditingValue.text);
         },
         maxWidth: maxWidth,
         padding: padding,
