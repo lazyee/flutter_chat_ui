@@ -44,7 +44,8 @@ class ChatTextBubbleContainer extends StatelessWidget {
           // renderBox.size;
           // .print('onLongPress:${_textGlobalKey.currentState}');
           // showChatToolBar(context, offset, renderBox.size);
-          _textGlobalKey.currentState?.selectAll();
+          _textGlobalKey.currentState
+              ?.selectAll(SelectionChangedCause.longPress);
 
           print(_textGlobalKey.currentState?.textEditingValue.text);
         },

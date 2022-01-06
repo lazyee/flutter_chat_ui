@@ -183,26 +183,6 @@ class CustomExtendedTextSelectionState
     super.initState();
   }
 
-  ///选择全部
-  void selectAll() {
-    userUpdateTextEditingValue(
-      TextEditingValue(
-        text: textEditingValue.text,
-        selection: TextSelection(
-          baseOffset: 0,
-          extentOffset: textEditingValue.text.length,
-        ),
-      ),
-      SelectionChangedCause.longPress,
-    );
-
-    // _selectionOverlay?.hide();
-    // _hideSelectionOverlayIfNeeded();
-    initSeletionOverlay();
-    _selectionOverlay?.showHandles();
-    // bringIntoView(textEditingValue.selection.extent);
-  }
-
   // void unSelect() {
   //   print('unSelect');
   //   _hideSelectionOverlayIfNeeded();
@@ -711,5 +691,36 @@ class CustomExtendedTextSelectionState
         _value = value;
       });
     }
+  }
+
+  @override
+  void copySelection(SelectionChangedCause cause) {}
+
+  @override
+  void cutSelection(SelectionChangedCause cause) {}
+
+  @override
+  Future<void> pasteText(SelectionChangedCause cause) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void selectAll(SelectionChangedCause cause) {
+    userUpdateTextEditingValue(
+      TextEditingValue(
+        text: textEditingValue.text,
+        selection: TextSelection(
+          baseOffset: 0,
+          extentOffset: textEditingValue.text.length,
+        ),
+      ),
+      SelectionChangedCause.longPress,
+    );
+
+    // _selectionOverlay?.hide();
+    // _hideSelectionOverlayIfNeeded();
+    initSeletionOverlay();
+    _selectionOverlay?.showHandles();
+    // bringIntoView(textEditingValue.selection.extent);
   }
 }
